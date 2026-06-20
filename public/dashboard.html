@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalper + BTC EA Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --scalp-color: #00d4ff;
+            --btc-color: #f7931a;
+            --success: #4cd9a0;
+            --warning: #f5b84c;
+            --danger: #f97a7a;
+            --bg-dark: #0b0f18;
+            --bg-card: rgba(255, 255, 255, 0.02);
+            --text-primary: #f0f6ff;
+            --text-secondary: #8aa2d0;
+            --border-color: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .dashboard {
+            max-width: 1480px;
+            width: 100%;
+            background: rgba(14, 20, 34, 0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 2.8rem;
+            padding: 2rem 2.4rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem 1.8rem;
+            margin-bottom: 2.2rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--scalp-color), var(--btc-color));
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #0b0f18;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+        }
+
+        .logo-text {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.6rem;
+        }
+        .logo-text span { color: var(--scalp-color); }
+        .logo-text .btc { color: var(--btc-color); }
+
+        .badge-scalp {
+            background: rgba(0, 212, 255, 0.12);
+            color: var(--scalp-color);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
+
+        .badge-btc {
+            background: rgba(247, 147, 26, 0.12);
+            color: var(--btc-color);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(247, 147, 26, 0.15);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            background: rgba(40, 210, 130, 0.12);
+            color: var(--success);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(40, 210, 130, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.4; transform: scale(0.95); }
+        }
+
+        .btn-primary {
+            background: var(--scalp-color);
+            border: none;
+            padding: 0.65rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #0b0f18;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 16px rgba(0, 212, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 24px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-btc {
+            background: var(--btc-color);
+            box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25);
+        }
+
+        .btn-btc:hover {
+            box-shadow: 0 10px 24px rgba(247, 147, 26, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: #d6e6ff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 2rem;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: 0.2s;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: #7a94c0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 4px;
+        }
+
+        .stat-value.scalp { color: var(--scalp-color); }
+        .stat-value.btc { color: var(--btc-color); }
+        .stat-value.green { color: var(--success); }
+        .stat-value.red { color: var(--danger); }
+
+        .stat-value small {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #6a86b0;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            color: var(--success);
+            background: rgba(40, 210, 130, 0.08);
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+            background: rgba(230, 80, 80, 0.08);
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0 1.2rem 0;
+        }
+
+        .section-title h2 {
+            color: #ecf2ff;
+            font-weight: 500;
+            font-size: 1.3rem;
+        }
+
+        .section-title i.scalp { color: var(--scalp-color); }
+        .section-title i.btc { color: var(--btc-color); }
+
+        .bot-list {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 2rem;
+            padding: 0.2rem;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .bot-item {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 0.8fr;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            color: #d4e0fc;
+            transition: 0.15s;
+            gap: 0.5rem;
+        }
+
+        .bot-item:last-child {
+            border-bottom: none;
+        }
+
+        .bot-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .bot-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .bot-name .scalp-icon { color: var(--scalp-color); }
+        .bot-name .btc-icon { color: var(--btc-color); }
+
+        .badge {
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .badge.success {
+            background: rgba(40, 210, 130, 0.12);
+            color: var(--success);
+            border-color: rgba(40, 210, 130, 0.1);
+        }
+
+        .badge.warning {
+            background: rgba(255, 180, 40, 0.12);
+            color: var(--warning);
+            border-color: rgba(255, 180, 40, 0.1);
+        }
+
+        .badge.danger {
+            background: rgba(230, 80, 80, 0.12);
+            color: var(--danger);
+            border-color: rgba(230, 80, 80, 0.1);
+        }
+
+        .badge i.fa-circle {
+            font-size: 0.4rem;
+            margin-right: 4px;
+        }
+
+        .bot-controls {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .ctrl-btn {
+            background: rgba(255,255,255,0.02);
+            border: none;
+            color: #a0b8e0;
+            padding: 0.4rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--scalp-color);
+            border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        .ctrl-btn.btc:hover {
+            background: rgba(247, 147, 26, 0.1);
+            color: var(--btc-color);
+            border-color: rgba(247, 147, 26, 0.1);
+        }
+
+        .ctrl-btn.stop { color: var(--danger); }
+        .ctrl-btn.stop:hover {
+            background: rgba(230, 80, 80, 0.1);
+            border-color: rgba(230, 80, 80, 0.1);
+        }
+
+        .ctrl-btn.start { color: var(--success); }
+        .ctrl-btn.start:hover {
+            background: rgba(40, 210, 130, 0.08);
+            border-color: rgba(40, 210, 130, 0.1);
+        }
+
+        .chart-placeholder {
+            margin-top: 2.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #b0c6ee;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-controls select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: #b0c6ee;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 100px;
+            padding-top: 10px;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            border-radius: 4px 4px 2px 2px;
+            min-height: 4px;
+            transition: 0.3s;
+        }
+
+        .bar.green { background: linear-gradient(180deg, var(--success), #2a8f6a); }
+        .bar.red { background: linear-gradient(180deg, var(--danger), #b84040); }
+        .bar.scalp { background: linear-gradient(180deg, var(--scalp-color), #0088aa); }
+        .bar.btc { background: linear-gradient(180deg, var(--btc-color), #b06b0a); }
+
+        .bar-label {
+            color: #4f6e9a;
+            font-size: 0.5rem;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .settings-panel {
+            margin-top: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .setting-item label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .setting-item input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: var(--scalp-color);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--scalp-color);
+            color: #0b0f18;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 2000;
+            max-width: 400px;
+            font-weight: 500;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); color: white; }
+        .toast.btc { background: var(--btc-color); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: rgba(18, 24, 34, 0.95);
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 2rem;
+            max-width: 420px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .close {
+            color: #6a86b0;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .modal-body { padding: 2rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--scalp-color);
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            color: #3a5277;
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .loading-placeholder {
+            text-align: center;
+            padding: 40px;
+            color: #6a86b0;
+        }
+        .loading-placeholder i { font-size: 2rem; margin-bottom: 1rem; }
+
+        @media (max-width: 700px) {
+            .dashboard { padding: 1rem; }
+            .bot-item {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 0.4rem;
+                padding: 0.8rem;
+            }
+            .bot-controls { grid-column: span 3; justify-content: flex-start; }
+            .header-actions .btn-secondary span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+                <div class="logo-text">Scalp<span>+</span><span class="btc">BTC</span></div>
+                <span class="badge-scalp"><i class="fas fa-bolt"></i> Scalper</span>
+                <span class="badge-btc"><i class="fab fa-bitcoin"></i> BTC</span>
+            </div>
+            <div class="header-actions">
+                <div class="status-badge" id="connectionStatus">
+                    <span class="pulse-dot"></span> Connected
+                </div>
+                <button class="btn-secondary" onclick="showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+                </button>
+                <button class="btn-secondary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> <span>Refresh</span>
+                </button>
+                <button class="btn-primary" onclick="scalpTrade()">
+                    <i class="fas fa-bolt"></i> Scalp
+                </button>
+                <button class="btn-primary btn-btc" onclick="btcTrade()">
+                    <i class="fab fa-bitcoin"></i> BTC
+                </button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-coins"></i> Balance</div>
+                <div class="stat-value" id="balance">$--</div>
+                <div class="stat-change" id="balanceChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-bolt scalp"></i> Scalper Trades</div>
+                <div class="stat-value scalp" id="scalpTrades">--</div>
+                <div class="stat-change" id="scalpChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fab fa-bitcoin btc"></i> BTC Price</div>
+                <div class="stat-value btc" id="btcPrice">$--</div>
+                <div class="stat-change" id="btcChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fas fa-robot"></i> Status</div>
+                <div class="stat-value green" id="botStatus">Active</div>
+                <div class="stat-change" id="statusChange">Running</div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <h2><i class="fas fa-bolt scalp"></i> Scalper Strategy</h2>
+            <span style="color: #4f6e9a; font-size: 0.8rem;" id="lastUpdate">last update: --</span>
+        </div>
+
+        <div class="bot-list" id="scalperList">
+            <div class="loading-placeholder">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading scalper data...</p>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 1.5rem;">
+            <h2><i class="fab fa-bitcoin btc"></i> BTC Trader</h2>
+        </div>
+
+        <div class="bot-list" id="btcList">
+            <div class="loading-placeholder">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading BTC data...</p>
+            </div>
+        </div>
+
+        <div class="chart-placeholder">
+            <div class="chart-head">
+                <span><i class="fas fa-chart-bar" style="color: var(--scalp-color);"></i> Market Data</span>
+                <div class="chart-controls">
+                    <select id="symbolSelect" onchange="loadChart(this.value)">
+                        <option value="EURUSD">EUR/USD</option>
+                        <option value="GBPUSD">GBP/USD</option>
+                        <option value="USDJPY">USD/JPY</option>
+                        <option value="BTCUSD" selected>BTC/USD</option>
+                    </select>
+                    <select id="timeframeSelect" onchange="loadChart(document.getElementById('symbolSelect').value)">
+                        <option value="M1">1m</option>
+                        <option value="M5" selected>5m</option>
+                        <option value="M15">15m</option>
+                        <option value="H1">1h</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-bars" id="chartBars">
+                <div class="loading-placeholder">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading chart...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-panel">
+            <div style="color: var(--text-secondary); margin-bottom: 1rem; display: flex; justify-content: space-between;">
+                <span><i class="fas fa-sliders-h"></i> Strategy Settings</span>
+                <button class="btn-secondary" onclick="saveSettings()" style="padding: 0.3rem 1rem; font-size: 0.8rem;">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label>Scalp Lot Size</label>
+                    <input type="number" id="scalpLot" step="0.01" value="0.01">
+                </div>
+                <div class="setting-item">
+                    <label>Scalp TP (pips)</label>
+                    <input type="number" id="scalpTP" step="5" value="50">
+                </div>
+                <div class="setting-item">
+                    <label>Scalp SL (pips)</label>
+                    <input type="number" id="scalpSL" step="5" value="30">
+                </div>
+                <div class="setting-item">
+                    <label>BTC Lot Size</label>
+                    <input type="number" id="btcLot" step="0.01" value="0.01">
+                </div>
+                <div class="setting-item">
+                    <label>BTC TP (pips)</label>
+                    <input type="number" id="btcTP" step="10" value="100">
+                </div>
+                <div class="setting-item">
+                    <label>BTC SL (pips)</label>
+                    <input type="number" id="btcSL" step="10" value="80">
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <span><i class="fas fa-bolt"></i> Scalper · <i class="fab fa-bitcoin"></i> BTC · 24/7</span>
+            <span><i class="fas fa-shield-alt"></i> v4.0 · <i class="fas fa-circle" style="color: var(--scalp-color); font-size: 0.4rem;"></i> ready</span>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sign-in-alt"></i> MT5 Login</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Login</label>
+                    <input type="number" id="mt5Login" placeholder="Enter MT5 login" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="mt5Password" placeholder="Enter MT5 password" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Server</label>
+                    <input type="text" id="mt5Server" placeholder="e.g. MetaQuotes-Demo" class="form-input">
+                </div>
+                <button class="btn-primary" onclick="loginMT5()" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-sign-in-alt"></i> Connect
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        let refreshInterval = null;
+        let socket = null;
+
+        // ============ WEBSOCKET ============
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            socket = new WebSocket(`${protocol}//${window.location.host}`);
+            
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                socket.send(JSON.stringify({ type: 'subscribe', data: 'market' }));
+                socket.send(JSON.stringify({ type: 'subscribe', data: 'scalper' }));
+            };
+            
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'market_update') updateChart(data.data);
+                    if (data.type === 'scalper_update') updateScalperStatus(data);
+                    if (data.type === 'scalper_trade') showToast(`Scalp: ${data.direction} ${data.lotSize} lots`, 'success');
+                    if (data.type === 'btc_trade') showToast(`BTC: ${data.direction} ${data.lotSize} lots`, 'btc');
+                } catch (e) { console.error('WebSocket error:', e); }
+            };
+            
+            socket.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        // ============ API ============
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: { 'Content-Type': 'application/json', ...options.headers }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'API error');
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast(error.message, 'error');
+                throw error;
+            }
+        }
+
+        // ============ LOAD DATA ============
+        async function loadDashboard() {
+            try {
+                // Load account
+                const account = await apiCall('/account');
+                if (account.success) {
+                    document.getElementById('balance').textContent = `$${account.balance.toFixed(2)}`;
+                    document.getElementById('connectionStatus').innerHTML = 
+                        `<span class="pulse-dot"></span> $${account.balance.toFixed(2)}`;
+                }
+
+                // Load scalper
+                const scalp = await apiCall('/scalper/status');
+                if (scalp.success) {
+                    document.getElementById('scalpTrades').textContent = scalp.tradesToday;
+                    document.getElementById('scalpChange').textContent = `${scalp.successRate.toFixed(1)}% win rate`;
+                    renderScalper(scalp);
+                    
+                    // Load settings
+                    document.getElementById('scalpLot').value = scalp.baseLot;
+                    document.getElementById('scalpTP').value = scalp.takeProfit;
+                    document.getElementById('scalpSL').value = scalp.stopLoss;
+                }
+
+                // Load BTC
+                const btc = await apiCall('/btc/status');
+                if (btc.success) {
+                    document.getElementById('btcPrice').textContent = `$${btc.btcPrice.toFixed(2)}`;
+                    document.getElementById('btcChange').textContent = `${btc.btcChange >= 0 ? '+' : ''}${btc.btcChange.toFixed(2)}%`;
+                    document.getElementById('btcChange').className = `stat-change ${btc.btcChange < 0 ? 'negative' : ''}`;
+                    renderBTC(btc);
+                    
+                    document.getElementById('btcLot').value = btc.baseLot;
+                    document.getElementById('btcTP').value = btc.takeProfit;
+                    document.getElementById('btcSL').value = btc.stopLoss;
+                }
+
+                const now = new Date();
+                document.getElementById('lastUpdate').textContent = `last update: ${now.toLocaleTimeString()}`;
+
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        // ============ RENDER SCALPER ============
+        function renderScalper(data) {
+            const container = document.getElementById('scalperList');
+            container.innerHTML = `
+                <div class="bot-item">
+                    <div class="bot-name">
+                        <i class="fas fa-bolt scalp-icon"></i>
+                        Scalper EA
+                        <span class="badge ${data.enabled ? 'success' : 'warning'}">
+                            <i class="fas fa-circle"></i> ${data.enabled ? 'Active' : 'Paused'}
+                        </span>
+                    </div>
+                    <div>${data.symbols.join(', ')}</div>
+                    <div><span style="color: var(--scalp-color);">${data.tradesToday}/${data.maxDailyTrades}</span></div>
+                    <div><span style="color:${data.totalProfit >= 0 ? '#4cd9a0' : '#f97a7a'};">${data.totalProfit >= 0 ? '+' : ''}${data.totalProfit.toFixed(2)}</span></div>
+                    <div class="bot-controls">
+                        <button class="ctrl-btn stop" onclick="toggleScalper(false)"><i class="fas fa-pause"></i></button>
+                        <button class="ctrl-btn start" onclick="toggleScalper(true)"><i class="fas fa-play"></i></button>
+                        <button class="ctrl-btn" onclick="scalpTrade()"><i class="fas fa-bolt"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============ RENDER BTC ============
+        function renderBTC(data) {
+            const container = document.getElementById('btcList');
+            container.innerHTML = `
+                <div class="bot-item">
+                    <div class="bot-name">
+                        <i class="fab fa-bitcoin btc-icon"></i>
+                        BTC Trader
+                        <span class="badge ${data.enabled ? 'success' : 'warning'}">
+                            <i class="fas fa-circle"></i> ${data.enabled ? 'Active' : 'Paused'}
+                        </span>
+                    </div>
+                    <div>${data.symbol}</div>
+                    <div><span style="color: var(--btc-color);">${data.tradesToday}/${data.maxDailyTrades}</span></div>
+                    <div><span style="color:${data.totalProfit >= 0 ? '#4cd9a0' : '#f97a7a'};">${data.totalProfit >= 0 ? '+' : ''}${data.totalProfit.toFixed(2)}</span></div>
+                    <div class="bot-controls">
+                        <button class="ctrl-btn stop btc" onclick="toggleBTC(false)"><i class="fas fa-pause"></i></button>
+                        <button class="ctrl-btn start btc" onclick="toggleBTC(true)"><i class="fas fa-play"></i></button>
+                        <button class="ctrl-btn btc" onclick="btcTrade()"><i class="fab fa-bitcoin"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============ CHART ============
+        async function loadChart(symbol = 'BTCUSD') {
+            try {
+                const timeframe = document.getElementById('timeframeSelect').value;
+                const data = await apiCall(`/market/${symbol}?timeframe=${timeframe}&bars=30`);
+                if (data.success && data.data) updateChart(data.data);
+            } catch (error) {
+                console.error('Chart load error:', error);
+            }
+        }
+
+        function updateChart(data) {
+            const container = document.getElementById('chartBars');
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="loading-placeholder"><p>No data</p></div>`;
+                return;
+            }
+
+            const maxPrice = Math.max(...data.map(b => b.high));
+            const minPrice = Math.min(...data.map(b => b.low));
+            const range = maxPrice - minPrice || 1;
+
+            container.innerHTML = data.map((bar, i) => {
+                const height = ((bar.close - minPrice) / range * 60) + 10;
+                const isGreen = bar.close >= bar.open;
+                const time = new Date(bar.time);
+                const label = time.getMinutes() % 5 === 0 ? time.getHours() + ':' + String(time.getMinutes()).padStart(2, '0') : '';
+                return `<div class="bar-wrapper">
+                    <div class="bar ${isGreen ? 'green' : 'red'}" style="height: ${height}px;"></div>
+                    <div class="bar-label">${label}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // ============ TRADING ACTIONS ============
+        async function scalpTrade() {
+            try {
+                showToast('Executing scalp trade...', 'info');
+                const result = await apiCall('/scalper/trade', {
+                    method: 'POST',
+                    body: JSON.stringify({ symbol: 'EURUSD' })
+                });
+                if (result.success) {
+                    showToast(`✅ Scalp: ${result.direction} ${result.lotSize} lots on ${result.symbol}`, 'success');
+                    loadDashboard();
+                } else {
+                    showToast(`❌ Scalp failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function btcTrade() {
+            try {
+                showToast('Executing BTC trade...', 'info');
+                const result = await apiCall('/btc/trade', {
+                    method: 'POST',
+                    body: JSON.stringify({ signal: 'auto' })
+                });
+                if (result.success) {
+                    showToast(`✅ BTC: ${result.direction} ${result.lotSize} lots`, 'btc');
+                    loadDashboard();
+                } else {
+                    showToast(`❌ BTC failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function toggleScalper(enabled) {
+            try {
+                await apiCall('/scalper/toggle', {
+                    method: 'POST',
+                    body: JSON.stringify({ enabled })
+                });
+                showToast(`Scalper ${enabled ? 'enabled' : 'disabled'}`, 'success');
+                loadDashboard();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function toggleBTC(enabled) {
+            try {
+                await apiCall('/btc/toggle', {
+                    method: 'POST',
+                    body: JSON.stringify({ enabled })
+                });
+                showToast(`BTC Trader ${enabled ? 'enabled' : 'disabled'}`, 'btc');
+                loadDashboard();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ============ SETTINGS ============
+        async function saveSettings() {
+            try {
+                const scalpSettings = {
+                    lotSize: parseFloat(document.getElementById('scalpLot').value),
+                    takeProfit: parseFloat(document.getElementById('scalpTP').value),
+                    stopLoss: parseFloat(document.getElementById('scalpSL').value)
+                };
+                await apiCall('/scalper/settings', {
+                    method: 'POST',
+                    body: JSON.stringify(scalpSettings)
+                });
+
+                const btcSettings = {
+                    lotSize: parseFloat(document.getElementById('btcLot').value),
+                    takeProfit: parseFloat(document.getElementById('btcTP').value),
+                    stopLoss: parseFloat(document.getElementById('btcSL').value)
+                };
+                await apiCall('/btc/settings', {
+                    method: 'POST',
+                    body: JSON.stringify(btcSettings)
+                });
+
+                showToast('Settings saved!', 'success');
+                loadDashboard();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ============ LOGIN ============
+        function showLoginModal() { document.getElementById('loginModal').style.display = 'block'; }
+        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+
+        async function loginMT5() {
+            const login = document.getElementById('mt5Login').value;
+            const password = document.getElementById('mt5Password').value;
+            const server = document.getElementById('mt5Server').value;
+            
+            if (!login || !password || !server) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            try {
+                showToast('Connecting to MT5...', 'info');
+                const result = await apiCall('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ login: parseInt(login), password, server })
+                });
+                
+                if (result.success) {
+                    showToast('✅ Login successful!', 'success');
+                    closeLoginModal();
+                    loadDashboard();
+                } else {
+                    showToast('❌ Login failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ============ TOAST ============
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.style.display = 'none', 4000);
+        }
+
+        // ============ REFRESH ============
+        function refreshData() {
+            showToast('Refreshing...', 'info');
+            loadDashboard();
+            loadChart(document.getElementById('symbolSelect').value);
+        }
+
+        // ============ INIT ============
+        async function init() {
+            connectWebSocket();
+            await loadDashboard();
+            await loadChart('BTCUSD');
+            refreshInterval = setInterval(loadDashboard, 10000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') refreshData();
+            if (e.key === 'Escape') closeLoginModal();
+        });
+
+        init();
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (socket) socket.close();
+        });
+    </script>
+</body>
+</html>
