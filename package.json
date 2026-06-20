@@ -1,0 +1,39 @@
+{
+  "name": "forex-scalper-btc-ea",
+  "version": "4.0.0",
+  "description": "Forex Scalper EA Bot with BTC Trading Support",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:logs": "pm2 logs",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "winston": "^3.10.0",
+    "socket.io": "^4.7.2",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4",
+    "rate-limit-flexible": "^2.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "node-cron": "^3.0.2",
+    "axios": "^1.5.0",
+    "technicalindicators": "^3.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "Scalper EA System",
+  "license": "MIT"
+}
